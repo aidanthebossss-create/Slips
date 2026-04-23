@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Slips" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Slip Tracker</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Slips</h1>
+    <nav>
+      <button data-view="capture" class="active">Capture</button>
+      <button data-view="browse">Browse</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="view-capture" class="view active">
+      <label class="shoot">
+        <input type="file" id="file" accept="image/*" capture="environment" />
+        <span>Take photo of slip</span>
+      </label>
+
+      <div id="preview-wrap" hidden>
+        <img id="preview" alt="" />
+        <div id="ocr-status"></div>
+      </div>
+
+      <form id="entry" hidden>
+        <label>
+          Amount
+          <input type="text" inputmode="decimal" id="amount" placeholder="0.00" required />
+        </label>
+        <label>
+          Date
+          <input type="date" id="date" required />
+        </label>
+        <fieldset id="cat-group">
+          <legend>Category</legend>
+          <label><input type="radio" name="category" value="1" required /> 1</label>
+          <label><input type="radio" name="category" value="2" /> 2</label>
+          <label><input type="radio" name="category" value="3" /> 3</label>
+          <label><input type="radio" name="category" value="4" /> 4</label>
+          <label><input type="radio" name="category" value="5" /> 5</label>
+        </fieldset>
+        <details>
+          <summary>OCR text</summary>
+          <pre id="ocr-text"></pre>
+        </details>
+        <div class="row">
+          <button type="button" id="discard">Discard</button>
+          <button type="submit" id="save">Save</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="view-browse" class="view">
+      <div class="toolbar">
+        <select id="filter-cat">
+          <option value="">All categories</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+        <button id="export">Export CSV</button>
+      </div>
+      <div id="totals"></div>
+      <div id="tree"></div>
+    </section>
+  </main>
+
+  <div id="viewer" hidden>
+    <button id="viewer-close">Close</button>
+    <img id="viewer-img" alt="" />
+    <div id="viewer-info"></div>
+    <button id="viewer-delete">Delete</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
