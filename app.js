@@ -246,13 +246,17 @@
     const cats = ['1','2','3','4','5'];
 
     for (const y of Object.keys(grouped).sort().reverse()) {
-      const yEl = document.createElement('div');
+      const yTotal = Object.values(grouped[y]).flatMap(cm => Object.values(cm)).flat().reduce((s, x) => s + x.amount, 0);
+      const yEl = document.createElement('details');
       yEl.className = 'year';
-      yEl.innerHTML = `<h2>${y}</h2>`;
+      yEl.open = true;
+      yEl.innerHTML = `<summary>${y}<span class="sum-total">${formatMoney(yTotal)}</span></summary>`;
       for (const m of Object.keys(grouped[y]).sort().reverse()) {
-        const mEl = document.createElement('div');
+        const mTotal = Object.values(grouped[y][m]).flat().reduce((s, x) => s + x.amount, 0);
+        const mEl = document.createElement('details');
         mEl.className = 'month';
-        mEl.innerHTML = `<h3>${monthNames[parseInt(m,10)-1]}</h3>`;
+        mEl.open = true;
+        mEl.innerHTML = `<summary>${monthNames[parseInt(m,10)-1]}<span class="sum-total">${formatMoney(mTotal)}</span></summary>`;
         for (const c of cats) {
           const slips = grouped[y][m][c];
           if (!slips) continue;

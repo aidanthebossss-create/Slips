@@ -163,12 +163,12 @@ fieldset label:has(input:checked) {
   font-weight: 600;
 }
 
-details {
+#entry details {
   background: var(--panel-2);
   border-radius: 8px;
   padding: 8px 10px;
 }
-details pre {
+#entry details pre {
   white-space: pre-wrap;
   word-break: break-word;
   font-size: 12px;
@@ -218,22 +218,52 @@ button#viewer-delete { background: var(--danger); color: #000; }
 #totals .row-t.grand { font-weight: 700; font-size: 16px; border-top: 1px solid var(--panel-2); margin-top: 6px; padding-top: 8px; }
 
 .year { margin-bottom: 12px; }
-.year > h2, .month > h3, .cat-sec > h4 {
+details.year, details.month {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+details.year > summary, details.month > summary, .cat-sec > h4 {
   margin: 8px 0 4px;
   color: var(--muted);
   font-weight: 600;
-}
-.year > h2 { font-size: 18px; color: var(--text); }
-.month > h3 { font-size: 16px; padding-left: 8px; }
-.cat-sec > h4 {
-  font-size: 14px;
-  padding-left: 16px;
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  gap: 8px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  position: relative;
+}
+details.year > summary::-webkit-details-marker,
+details.month > summary::-webkit-details-marker { display: none; }
+details.year > summary::before,
+details.month > summary::before {
+  content: "";
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 6px solid var(--muted);
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  transform: rotate(90deg);
+  transition: transform 0.15s;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+details.year:not([open]) > summary::before,
+details.month:not([open]) > summary::before {
+  transform: rotate(0deg);
+}
+details.year > summary { font-size: 18px; color: var(--text); padding-right: 4px; }
+details.month > summary { font-size: 16px; padding-left: 8px; padding-right: 4px; }
+.cat-sec > h4 {
+  font-size: 14px;
+  padding-left: 16px;
   padding-right: 4px;
 }
-.cat-total { color: var(--accent); font-weight: 700; }
+.sum-total, .cat-total { color: var(--accent); font-weight: 700; margin-left: auto; }
 
 .slips {
   display: grid;
