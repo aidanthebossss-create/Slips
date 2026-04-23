@@ -1,4 +1,4 @@
-const VERSION = 'slips-v1';
+const VERSION = 'slips-v2';
 const CORE = [
   './',
   'index.html',

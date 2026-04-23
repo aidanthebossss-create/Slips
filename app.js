@@ -50,24 +50,48 @@
     });
   }
 
+  const NUM_RE = /([0-9]{1,3}(?:[ ,.][0-9]{3})*[.,][0-9]{2}|[0-9]+[.,][0-9]{2})/g;
+
+  function lastNumber(line) {
+    const nums = [...line.matchAll(NUM_RE)];
+    if (!nums.length) return null;
+    return toNumber(nums[nums.length - 1][1]);
+  }
+
   function parseAmount(text) {
     if (!text) return null;
     const clean = text.replace(/\r/g, '');
     const lines = clean.split('\n');
-    const keywordRe = /(grand\s*total|sub\s*total|total|amount\s*due|balance|amount|due|paid)/i;
-    const numRe = /([0-9]{1,3}(?:[ ,.][0-9]{3})*[.,][0-9]{2}|[0-9]+[.,][0-9]{2})/;
 
-    for (const line of lines) {
-      if (keywordRe.test(line)) {
-        const nums = [...line.matchAll(new RegExp(numRe.source, 'g'))];
-        if (nums.length) {
-          const last = nums[nums.length - 1][1];
-          const n = toNumber(last);
-          if (n !== null) return n;
-        }
+    const totalHits = [];
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (/sub[\s-]*total/i.test(line)) continue;
+      if (/\btotals?\b/i.test(line)) {
+        totalHits.push({ i, line, grand: /grand[\s-]*total/i.test(line) });
       }
     }
-    const allNums = [...clean.matchAll(new RegExp(numRe.source, 'g'))]
+    totalHits.sort((a, b) => (b.grand - a.grand) || (b.i - a.i));
+
+    for (const hit of totalHits) {
+      const n = lastNumber(hit.line);
+      if (n != null) return n;
+      const next = lines[hit.i + 1];
+      if (next) {
+        const n2 = lastNumber(next);
+        if (n2 != null) return n2;
+      }
+    }
+
+    const keywordRe = /(amount\s*due|balance|amount|due|paid)/i;
+    for (const line of lines) {
+      if (keywordRe.test(line)) {
+        const n = lastNumber(line);
+        if (n != null) return n;
+      }
+    }
+
+    const allNums = [...clean.matchAll(NUM_RE)]
       .map(m => toNumber(m[1]))
       .filter(n => n !== null && n > 0 && n < 1000000);
     if (allNums.length) return Math.max(...allNums);
@@ -211,14 +235,15 @@
 
     const grouped = {};
     for (const s of filtered) {
-      const [y, m, d] = s.date.split('-');
+      const [y, m] = s.date.split('-');
       grouped[y] ??= {};
       grouped[y][m] ??= {};
-      grouped[y][m][d] ??= [];
-      grouped[y][m][d].push(s);
+      grouped[y][m][s.category] ??= [];
+      grouped[y][m][s.category].push(s);
     }
 
     const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const cats = ['1','2','3','4','5'];
 
     for (const y of Object.keys(grouped).sort().reverse()) {
       const yEl = document.createElement('div');
@@ -228,27 +253,30 @@
         const mEl = document.createElement('div');
         mEl.className = 'month';
         mEl.innerHTML = `<h3>${monthNames[parseInt(m,10)-1]}</h3>`;
-        for (const d of Object.keys(grouped[y][m]).sort().reverse()) {
-          const dEl = document.createElement('div');
-          dEl.className = 'day';
-          dEl.innerHTML = `<h4>${parseInt(d,10)} ${monthNames[parseInt(m,10)-1]}</h4>`;
+        for (const c of cats) {
+          const slips = grouped[y][m][c];
+          if (!slips) continue;
+          const catTotal = slips.reduce((sum, s) => sum + s.amount, 0);
+          const cEl = document.createElement('div');
+          cEl.className = 'cat-sec';
+          cEl.innerHTML = `<h4>Category ${c}<span class="cat-total">${formatMoney(catTotal)}</span></h4>`;
           const grid = document.createElement('div');
           grid.className = 'slips';
-          for (const s of grouped[y][m][d]) {
+          for (const s of slips) {
             const el = document.createElement('div');
             el.className = 'slip';
             el.dataset.id = s.id;
             const url = URL.createObjectURL(s.blob);
+            const day = parseInt(s.date.split('-')[2], 10);
             el.innerHTML = `
               <img src="${url}" alt="" />
-              <div class="cat">${s.category}</div>
-              <div class="tag"><span>${formatMoney(s.amount)}</span></div>
+              <div class="tag"><span>${day}</span><span>${formatMoney(s.amount)}</span></div>
             `;
             el.addEventListener('click', () => openViewer(s));
             grid.appendChild(el);
           }
-          dEl.appendChild(grid);
-          mEl.appendChild(dEl);
+          cEl.appendChild(grid);
+          mEl.appendChild(cEl);
         }
         yEl.appendChild(mEl);
       }

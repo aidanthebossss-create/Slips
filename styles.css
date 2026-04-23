@@ -218,14 +218,22 @@ button#viewer-delete { background: var(--danger); color: #000; }
 #totals .row-t.grand { font-weight: 700; font-size: 16px; border-top: 1px solid var(--panel-2); margin-top: 6px; padding-top: 8px; }
 
 .year { margin-bottom: 12px; }
-.year > h2, .month > h3, .day > h4 {
+.year > h2, .month > h3, .cat-sec > h4 {
   margin: 8px 0 4px;
   color: var(--muted);
   font-weight: 600;
 }
 .year > h2 { font-size: 18px; color: var(--text); }
 .month > h3 { font-size: 16px; padding-left: 8px; }
-.day > h4 { font-size: 14px; padding-left: 16px; }
+.cat-sec > h4 {
+  font-size: 14px;
+  padding-left: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-right: 4px;
+}
+.cat-total { color: var(--accent); font-weight: 700; }
 
 .slips {
   display: grid;
@@ -252,22 +260,6 @@ button#viewer-delete { background: var(--danger); color: #000; }
   display: flex;
   justify-content: space-between;
 }
-.slip .cat {
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: #000;
-  font-size: 12px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 #viewer {
   position: fixed;
   inset: 0;
